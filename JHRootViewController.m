@@ -81,6 +81,41 @@
   
 }
 
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+  CGPoint tappedPt = [[touches anyObject] locationInView: self.view];
+  NSLog(@"point pressed %@",NSStringFromCGPoint(tappedPt));
+  
+  CGFloat diff = lastPoint.x - tappedPt.x;
+  
+  if(diff > 0) {
+    NSLog(@"Generate ... toward left means reveal right");
+  } else {
+    
+    if(320.0f - tappedPt.x > -50.0f && leftController.view.frame.origin.x + 1.0f <= 0) {
+      NSLog(@"left controller reveal upto x ---> %f", (leftController.view.frame.origin.x + 1.0f));
+      NSLog(@"center controller reveal upto x ---> %f", (centerController.view.frame.origin.x + 1.0f));
+      
+      
+      CGRect leftRect;
+      CGRect centerRect;
+      
+      leftRect = CGRectMake(leftController.view.frame.origin.x + 2.0f, 0, self.view.frame.size.width, self.view.frame.size.height);
+      centerRect = CGRectMake(centerController.view.frame.origin.x + 1.25f, 0, self.view.frame.size.width, self.view.frame.size.height);
+      
+      
+      leftController.view.frame = leftRect ;
+      centerController.view.frame = centerRect;
+      self.navigationController.navigationBar.frame = CGRectMake(centerRect.origin.x, 20, KSCREEN_WIDTH, 44);
+    } else {
+      NSLog(@"stop revealing ... %f", tappedPt.x - 320.0f);
+    }
+    //leftRect = CGRectMake(-320 + tappedPt.x, 0, self.view.frame.size.width - KREVEAL_GAP, self.view.frame.size.height);
+    //centerRect = CGRectMake(KSCREEN_WIDTH - KREVEAL_GAP, 0, self.view.frame.size.width - KREVEAL_GAP, self.view.frame.size.height);
+    
+  }
+  lastPoint = tappedPt;
+}
+
 -(void) loadView {
   [super loadView];
   
