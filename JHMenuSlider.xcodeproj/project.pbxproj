@@ -52,14 +52,15 @@
 		794C0FDA18A641D900FF80A6 /* JHMenuSliderTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "JHMenuSliderTests-Info.plist"; sourceTree = "<group>"; };
 		794C0FDC18A641D900FF80A6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		794C0FDE18A641D900FF80A6 /* JHMenuSliderTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JHMenuSliderTests.m; sourceTree = "<group>"; };
-		794C0FEA18A6456500FF80A6 /* JHLeftViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JHLeftViewController.h; sourceTree = "<group>"; };
-		794C0FEB18A6456500FF80A6 /* JHLeftViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JHLeftViewController.m; sourceTree = "<group>"; };
-		794C0FED18A6457800FF80A6 /* JHCenterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JHCenterViewController.h; sourceTree = "<group>"; };
-		794C0FEE18A6457800FF80A6 /* JHCenterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JHCenterViewController.m; sourceTree = "<group>"; };
-		794C0FF018A6458600FF80A6 /* JHRightViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JHRightViewController.h; sourceTree = "<group>"; };
-		794C0FF118A6458600FF80A6 /* JHRightViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JHRightViewController.m; sourceTree = "<group>"; };
+		794C0FEA18A6456500FF80A6 /* JHLeftViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JHLeftViewController.h; path = ../JHLeftViewController.h; sourceTree = "<group>"; };
+		794C0FEB18A6456500FF80A6 /* JHLeftViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JHLeftViewController.m; path = ../JHLeftViewController.m; sourceTree = "<group>"; };
+		794C0FED18A6457800FF80A6 /* JHCenterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JHCenterViewController.h; path = ../JHCenterViewController.h; sourceTree = "<group>"; };
+		794C0FEE18A6457800FF80A6 /* JHCenterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JHCenterViewController.m; path = ../JHCenterViewController.m; sourceTree = "<group>"; };
+		794C0FF018A6458600FF80A6 /* JHRightViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JHRightViewController.h; path = ../JHRightViewController.h; sourceTree = "<group>"; };
+		794C0FF118A6458600FF80A6 /* JHRightViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JHRightViewController.m; path = ../JHRightViewController.m; sourceTree = "<group>"; };
 		794C0FF318A645FD00FF80A6 /* JHRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JHRootViewController.h; sourceTree = "<group>"; };
 		794C0FF418A645FD00FF80A6 /* JHRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JHRootViewController.m; sourceTree = "<group>"; };
+		794C0FF718A6668F00FF80A6 /* JHConstant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JHConstant.h; path = menuslider/JHConstant.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +162,12 @@
 		794C0FE818A6450A00FF80A6 /* controllers */ = {
 			isa = PBXGroup;
 			children = (
+				794C0FEA18A6456500FF80A6 /* JHLeftViewController.h */,
+				794C0FEB18A6456500FF80A6 /* JHLeftViewController.m */,
+				794C0FED18A6457800FF80A6 /* JHCenterViewController.h */,
+				794C0FEE18A6457800FF80A6 /* JHCenterViewController.m */,
+				794C0FF018A6458600FF80A6 /* JHRightViewController.h */,
+				794C0FF118A6458600FF80A6 /* JHRightViewController.m */,
 			);
 			name = controllers;
 			sourceTree = "<group>";
@@ -168,14 +175,9 @@
 		794C0FE918A6451C00FF80A6 /* menuslider */ = {
 			isa = PBXGroup;
 			children = (
-				794C0FEA18A6456500FF80A6 /* JHLeftViewController.h */,
-				794C0FEB18A6456500FF80A6 /* JHLeftViewController.m */,
-				794C0FED18A6457800FF80A6 /* JHCenterViewController.h */,
-				794C0FEE18A6457800FF80A6 /* JHCenterViewController.m */,
-				794C0FF018A6458600FF80A6 /* JHRightViewController.h */,
-				794C0FF118A6458600FF80A6 /* JHRightViewController.m */,
 				794C0FF318A645FD00FF80A6 /* JHRootViewController.h */,
 				794C0FF418A645FD00FF80A6 /* JHRootViewController.m */,
+				794C0FF718A6668F00FF80A6 /* JHConstant.h */,
 			);
 			name = menuslider;
 			sourceTree = "<group>";
@@ -400,10 +402,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Ryo Kawaoka (SNSDCRZMKL)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "JHMenuSlider/JHMenuSlider-Prefix.pch";
 				INFOPLIST_FILE = "JHMenuSlider/JHMenuSlider-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "B7997068-341E-4769-AD72-0A4032E2B82F";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -413,10 +417,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Ryo Kawaoka (SNSDCRZMKL)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "JHMenuSlider/JHMenuSlider-Prefix.pch";
 				INFOPLIST_FILE = "JHMenuSlider/JHMenuSlider-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "B7997068-341E-4769-AD72-0A4032E2B82F";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
