@@ -7,16 +7,20 @@
 //
 
 #import "JHAppDelegate.h"
+#import "JHRootViewController.h"
 
 @implementation JHAppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
-    [self.window makeKeyAndVisible];
-    return YES;
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  
+  self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  // Override point for customization after application launch.
+  self.window.backgroundColor = [UIColor whiteColor];
+  JHRootViewController *controller = [[JHRootViewController alloc] initWithNibName:nil bundle:nil];
+  UINavigationController * navi = [[UINavigationController alloc] initWithRootViewController:controller];
+  self.window.rootViewController = navi;
+  [self.window makeKeyAndVisible];
+  return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
