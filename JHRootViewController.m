@@ -1,10 +1,33 @@
-//
-//  JHRootViewController.m
-//  JHMenuSlider
-//
-//  Created by Praveen Sharma on 08/02/14.
-//  Copyright (c) 2014 Jhaliya. All rights reserved.
-//
+/*
+ 
+ JHRootViewController.m
+ JHMenuSlider
+ 
+ Created by Praveen Sharma on 08/02/14.
+ Copyright (c) 2014 Jhaliya. All rights reserved.
+ 
+ The MIT License (MIT)
+ 
+ Copyright (c) 2014 Praveen Sharma
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of
+ this software and associated documentation files (the "Software"), to deal in
+ the Software without restriction, including without limitation the rights to
+ use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ the Software, and to permit persons to whom the Software is furnished to do so,
+ subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ 
+*/
 
 #import "JHRootViewController.h"
 #import "JHLeftViewController.h"
@@ -16,9 +39,31 @@
   JHLeftViewController *leftController;
   JHCenterViewController *centerController;
   JHRightViewController *rightController;
-
   UIView *currentView;
-  CGPoint lastPoint;
+}
+
++ (UIImage *) navigationButtonImage {
+	static UIImage *naviImage = nil;
+	static dispatch_once_t onceToken;
+  
+	dispatch_once(&onceToken, ^{
+		UIGraphicsBeginImageContextWithOptions(CGSizeMake(20.f, 13.f), NO, 0.0f);
+		
+		[[UIColor greenColor] setFill];
+		[[UIBezierPath bezierPathWithRect:CGRectMake(0, 0, 20, 1)] fill];
+		[[UIBezierPath bezierPathWithRect:CGRectMake(0, 5, 20, 1)] fill];
+		[[UIBezierPath bezierPathWithRect:CGRectMake(0, 10, 20, 1)] fill];
+		
+		[[UIColor yellowColor] setFill];
+		[[UIBezierPath bezierPathWithRect:CGRectMake(0, 1, 20, 2)] fill];
+		[[UIBezierPath bezierPathWithRect:CGRectMake(0, 6,  20, 2)] fill];
+		[[UIBezierPath bezierPathWithRect:CGRectMake(0, 11, 20, 2)] fill];
+		
+		naviImage = UIGraphicsGetImageFromCurrentImageContext();
+		UIGraphicsEndImageContext();
+    
+	});
+  return naviImage;
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -31,7 +76,7 @@
     leftController = [[JHLeftViewController alloc] initWithNibName:nil bundle:nil];
     centerController = [[JHCenterViewController alloc] initWithNibName:nil bundle:nil];
     rightController = [[JHRightViewController alloc] initWithNibName:nil bundle:nil];
- 
+    
     [self.view addSubview:leftController.view];
     [self.view addSubview:centerController.view];
     [self.view addSubview:rightController.view];
@@ -66,115 +111,75 @@
   } else if(currentView == leftController.view) {
     [self leftRootButtonBarEvent:nil];
   }
-  
   NSLog(@"Left swipe gesture");
 }
 
 -(void)swiperight:(UISwipeGestureRecognizer*)gestureRecognizer {
-  NSLog(@"Right swipe gesture");
-  
   if(currentView == centerController.view) {
     [self leftRootButtonBarEvent:nil];
   } else if(currentView == rightController.view) {
     [self rightRootButtonBarEvent:nil];
   }
-  
+  NSLog(@"Right swipe gesture");
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-  CGPoint tappedPt = [[touches anyObject] locationInView: self.view];
-  NSLog(@"point pressed %@",NSStringFromCGPoint(tappedPt));
-  
-  CGFloat diff = lastPoint.x - tappedPt.x;
-  
-  if(diff > 0) {
-    NSLog(@"Generate ... toward left means reveal right");
-  } else {
-    
-    if(320.0f - tappedPt.x > -50.0f && leftController.view.frame.origin.x + 1.0f <= 0) {
-      NSLog(@"left controller reveal upto x ---> %f", (leftController.view.frame.origin.x + 1.0f));
-      NSLog(@"center controller reveal upto x ---> %f", (centerController.view.frame.origin.x + 1.0f));
-      
-      
-      CGRect leftRect;
-      CGRect centerRect;
-      
-      leftRect = CGRectMake(leftController.view.frame.origin.x + 2.0f, 0, self.view.frame.size.width, self.view.frame.size.height);
-      centerRect = CGRectMake(centerController.view.frame.origin.x + 1.25f, 0, self.view.frame.size.width, self.view.frame.size.height);
-      
-      
-      leftController.view.frame = leftRect ;
-      centerController.view.frame = centerRect;
-      self.navigationController.navigationBar.frame = CGRectMake(centerRect.origin.x, 20, KSCREEN_WIDTH, 44);
-    } else {
-      NSLog(@"stop revealing ... %f", tappedPt.x - 320.0f);
-    }
-    //leftRect = CGRectMake(-320 + tappedPt.x, 0, self.view.frame.size.width - KREVEAL_GAP, self.view.frame.size.height);
-    //centerRect = CGRectMake(KSCREEN_WIDTH - KREVEAL_GAP, 0, self.view.frame.size.width - KREVEAL_GAP, self.view.frame.size.height);
-    
-  }
-  lastPoint = tappedPt;
-}
 
 -(void) loadView {
   [super loadView];
-  
   self.title = @"Root controller";
-  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(leftRootButtonBarEvent:)];
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(rightRootButtonBarEvent:)];
+  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[[self class] navigationButtonImage] style:UIBarButtonItemStylePlain target:self action:@selector(leftRootButtonBarEvent:)];
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[[self class] navigationButtonImage] style:UIBarButtonItemStylePlain target:self action:@selector(rightRootButtonBarEvent:)];
 }
 
--(void) rightRootButtonBarEvent:(id)sender {
+-(void) rightRootButtonBarEvent:(__unused id)sender {
   
   CGRect rRect;
-  CGRect centerRect;
+  CGRect cRect;
   
   if(currentView == centerController.view) {
     currentView = rightController.view;
     rRect = CGRectMake(KREVEAL_GAP, 0, self.view.frame.size.width,
                        self.view.frame.size.height);
-    centerRect = CGRectMake(-KSCREEN_WIDTH + KREVEAL_GAP, 0, self.view.frame.size.width,
+    cRect = CGRectMake(-KSCREEN_WIDTH + KREVEAL_GAP, 0, self.view.frame.size.width,
                             self.view.frame.size.height);
   } else {
     currentView = centerController.view;
     rRect = CGRectMake(KSCREEN_WIDTH, 0, self.view.frame.size.width, self.view.frame.size.height);
-    centerRect  = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+    cRect  = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
   }
   
-  [UIView animateWithDuration:1.0 delay:0.0 usingSpringWithDamping:1.0 initialSpringVelocity:0.1
-                      options:UIViewAnimationOptionCurveEaseInOut animations:^{
+  [UIView animateWithDuration:KANIMATION_TIME delay:KANIMATION_DELAY usingSpringWithDamping:KSPRING_WITH_DAMPING
+        initialSpringVelocity:KINITIAL_SPRING_VALOCITY options:UIViewAnimationOptionCurveEaseInOut
+                   animations:^{
                         rightController.view.frame = rRect ;
-                        centerController.view.frame = centerRect;
-                        self.navigationController.navigationBar.frame = CGRectMake(centerRect.origin.x, 20, KSCREEN_WIDTH, 44);
-                      } completion:^(BOOL finished) {
-                        
-                      }];
+                        centerController.view.frame = cRect;
+                        self.navigationController.navigationBar.frame = CGRectMake(cRect.origin.x, KNAVIGATION_BAR_Y, KSCREEN_WIDTH, KNAVIGATION_BAR_HEIGHT);
+                      } completion:nil];
 }
 
 -(void) leftRootButtonBarEvent:(id)sender {
   
-  CGRect leftRect;
-  CGRect centerRect;
+  CGRect lRect;
+  CGRect cRect;
   
   if(currentView == centerController.view) {
     currentView = leftController.view;
-    leftRect = CGRectMake(0, 0, self.view.frame.size.width - KREVEAL_GAP, self.view.frame.size.height);
-    centerRect = CGRectMake(KSCREEN_WIDTH - KREVEAL_GAP, 0, self.view.frame.size.width - KREVEAL_GAP,
+    lRect = CGRectMake(0, 0, self.view.frame.size.width - KREVEAL_GAP, self.view.frame.size.height);
+    cRect = CGRectMake(KSCREEN_WIDTH - KREVEAL_GAP, 0, self.view.frame.size.width - KREVEAL_GAP,
                             self.view.frame.size.height);
   } else {
     currentView = centerController.view;
-    leftRect = CGRectMake(-KSCREEN_WIDTH, 0, self.view.frame.size.width, self.view.frame.size.height);
-    centerRect  = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+    lRect = CGRectMake(-KSCREEN_WIDTH, 0, self.view.frame.size.width, self.view.frame.size.height);
+    cRect = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
   }
   
-  [UIView animateWithDuration:1.0 delay:0.0 usingSpringWithDamping:1.0 initialSpringVelocity:0.1
-                      options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                        leftController.view.frame = leftRect ;
-                        centerController.view.frame = centerRect;
-                        self.navigationController.navigationBar.frame = CGRectMake(centerRect.origin.x, 20, KSCREEN_WIDTH, 44);
-                      } completion:^(BOOL finished) {
-                        
-                      }];
+  [UIView animateWithDuration:KANIMATION_TIME delay:KANIMATION_DELAY usingSpringWithDamping:KSPRING_WITH_DAMPING
+        initialSpringVelocity:KINITIAL_SPRING_VALOCITY options:UIViewAnimationOptionCurveEaseInOut
+                   animations:^{
+                        leftController.view.frame = lRect ;
+                        centerController.view.frame = cRect;
+                        self.navigationController.navigationBar.frame = CGRectMake(cRect.origin.x, KNAVIGATION_BAR_Y, KSCREEN_WIDTH, KNAVIGATION_BAR_HEIGHT);
+                      } completion:nil];
   
 }
 
