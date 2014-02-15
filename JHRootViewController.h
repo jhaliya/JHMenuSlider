@@ -32,4 +32,5 @@
 #import <UIKit/UIKit.h>
 
 @interface JHRootViewController : UIViewController
+
 @end
