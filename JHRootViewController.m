@@ -41,7 +41,7 @@ ELeftView,
 ERootView,
 ERightView,
 ENoneView,
-} JHCurrentView;
+} JHCurrentView,JHOpenView;
 
 #define kMenuTransformScale CATransform3DMakeScale(0.85, 0.85, 0.85)
 #define kMenuLayerInitialOpacity 0.4f
@@ -55,9 +55,9 @@ ENoneView,
   
   UITapGestureRecognizer *tapGestureRecognizer;
   UIPanGestureRecognizer *panGestureRecognizer;
-  
-  
-   UIView *eventView;
+  JHOpenView openView;
+  BOOL isFingerLift;
+  UIView *eventView;
 }
 
 + (UIImage *) navigationButtonImage {
@@ -96,9 +96,9 @@ ENoneView,
     rightController = [[JHRightViewController alloc] initWithNibName:nil bundle:nil];
     
     [self.view addSubview:leftController.view];
-    [self.view addSubview:centerController.view];
     [self.view addSubview:rightController.view];
-    
+    [self.view addSubview:centerController.view];
+
     //Shadow effect
     //[self controllerShadow:leftController];
     //[self controllerShadow:centerController];
@@ -107,6 +107,7 @@ ENoneView,
     currentView = centerController.view;
     
     lastGesturePoint  = CGPointMake(0, 0);
+    openView = ERootView;
   }
   return self;
 }
@@ -151,15 +152,16 @@ ENoneView,
   return ENoneView;
 }
 
+-(JHOpenView) openViewState {
+  return openView;
+}
 -(void)viewWillAppear:(BOOL)animated  {
   [super viewWillAppear:animated];
-  
   centerController.view.frame = self.view.frame;
-  leftController.view.frame =  CGRectMake(-KSCREEN_WIDTH, 0, self.view.frame.size.width,
+  leftController.view.frame =  CGRectMake(0, 0, self.view.frame.size.width-KREVEAL_GAP,
                                           self.view.frame.size.height);
-  rightController.view.frame =  CGRectMake(KSCREEN_WIDTH, 0, self.view.frame.size.width,
+  rightController.view.frame =  CGRectMake(KREVEAL_GAP, 0, self.view.frame.size.width-KREVEAL_GAP,
                                            self.view.frame.size.height);
-
   
   tapGestureRecognizer = [[UITapGestureRecognizer alloc] init];
   panGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
@@ -183,26 +185,23 @@ ENoneView,
 }
 
 -(void) rightRootButtonBarEvent:(__unused id)sender {
-  
-  CGRect rRect;
   CGRect cRect;
   
-  if(currentView == centerController.view) {
-    currentView = rightController.view;
-    rRect = CGRectMake(KREVEAL_GAP, 0, self.view.frame.size.width,
-                       self.view.frame.size.height);
+  if(openView  == ERootView) {
+    openView = ERightView;
+    if([[self.view subviews] indexOfObject:rightController.view] == 0) {
+      [self.view exchangeSubviewAtIndex:0 withSubviewAtIndex:1];
+    }
     cRect = CGRectMake(-KSCREEN_WIDTH + KREVEAL_GAP, 0, self.view.frame.size.width,
                             self.view.frame.size.height);
   } else {
-    currentView = centerController.view;
-    rRect = CGRectMake(KSCREEN_WIDTH, 0, self.view.frame.size.width, self.view.frame.size.height);
+    openView = ERootView;
     cRect  = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
   }
   
   [UIView animateWithDuration:KANIMATION_TIME delay:KANIMATION_DELAY usingSpringWithDamping:KSPRING_WITH_DAMPING
         initialSpringVelocity:KINITIAL_SPRING_VALOCITY options:UIViewAnimationOptionCurveEaseInOut
                    animations:^{
-                        rightController.view.frame = rRect ;
                         centerController.view.frame = cRect;
                         self.navigationController.navigationBar.frame = CGRectMake(cRect.origin.x, KNAVIGATION_BAR_Y, KSCREEN_WIDTH, KNAVIGATION_BAR_HEIGHT);
                       } completion:nil];
@@ -210,24 +209,23 @@ ENoneView,
 
 -(void) leftRootButtonBarEvent:(id)sender {
   
-  CGRect lRect;
   CGRect cRect;
   
-  if(currentView == centerController.view) {
-    currentView = leftController.view;
-    lRect = CGRectMake(0, 0, self.view.frame.size.width - KREVEAL_GAP, self.view.frame.size.height);
+  if(openView  == ERootView) {
+    openView = ELeftView;
+    if([[self.view subviews] indexOfObject:leftController.view] == 0) {
+      [self.view exchangeSubviewAtIndex:0 withSubviewAtIndex:1];
+    }
     cRect = CGRectMake(KSCREEN_WIDTH - KREVEAL_GAP, 0, self.view.frame.size.width - KREVEAL_GAP,
                             self.view.frame.size.height);
   } else {
-    currentView = centerController.view;
-    lRect = CGRectMake(-KSCREEN_WIDTH, 0, self.view.frame.size.width, self.view.frame.size.height);
+    openView = ERootView;
     cRect = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
   }
   
   [UIView animateWithDuration:KANIMATION_TIME delay:KANIMATION_DELAY usingSpringWithDamping:KSPRING_WITH_DAMPING
         initialSpringVelocity:KINITIAL_SPRING_VALOCITY options:UIViewAnimationOptionCurveEaseInOut
                    animations:^{
-                        leftController.view.frame = lRect ;
                         centerController.view.frame = cRect;
                         self.navigationController.navigationBar.frame = CGRectMake(cRect.origin.x, KNAVIGATION_BAR_Y, KSCREEN_WIDTH, KNAVIGATION_BAR_HEIGHT);
                       } completion:nil];
@@ -261,31 +259,206 @@ ENoneView,
 
 - (void)handleTapGestureRecognizer:(UITapGestureRecognizer *)tap {
   NSLog(@"handleTapGesture");
-  
-  if([self currentViewState] == ELeftView) {
+  if(openView == ELeftView) {
     [self leftRootButtonBarEvent:nil];
-  } else if([self currentViewState] == ERightView) {
+  } else if( openView == ERightView) {
     [self rightRootButtonBarEvent:nil];
   }
+}
+
+-(void) changeUnderneathView:(BOOL) toRightView {
   
+  if(!toRightView) {
+    NSLog(@"Changing from left to right ");
+    if([[self.view subviews] indexOfObject:leftController.view] == 0) {
+      [self.view exchangeSubviewAtIndex:0 withSubviewAtIndex:1];
+      }
+    } else {
+      NSLog(@"Changing from right to left");
+      if([[self.view subviews] indexOfObject:rightController.view] == 0) {
+        [self.view exchangeSubviewAtIndex:0 withSubviewAtIndex:1];
+      }
+    }
 }
 
 - (void)handlePanGestureRecognizer:(UIPanGestureRecognizer *)gesture {
   
-  JHCurrentView currentViewValue =  [self currentViewState];
+  CGPoint translation = [gesture translationInView:centerController.view];
+  //CGPoint pointInView = [gesture locationInView:centerController.view];
   
-  CGPoint translation = [gesture translationInView:currentView.superview];
-  //NSLog(@"gesture points --> %@", NSStringFromCGPoint(translation));
-  if(fabsf(translation.x) - fabsf(lastGesturePoint.x) > 0) {
-    NSLog(@"point increasing ...");
-  } else  {
-    NSLog(@"point decereasing ...");
+  NSLog(@"translation -->%@",NSStringFromCGPoint(translation));
+  //NSLog(@"pointInView -->%@",NSStringFromCGPoint(pointInView));
+
+  //CGFloat pointScale = translation.x * 1.5;
+  
+  if([gesture state] == UIGestureRecognizerStateBegan) {
+    isFingerLift = YES;
+    if( openView == ERootView)
+      isFingerLift = NO;
+    NSLog(@"UIGestureRecognizerStateBegan");
+  } else if([gesture state] == UIGestureRecognizerStateEnded) {
+    isFingerLift = YES;
+    if(centerController.view.frame.origin.x > 0) {
+      if(centerController.view.frame.origin.x < 100) {
+        openView  = ELeftView;
+      } else if(centerController.view.frame.origin.x > 200) {
+        openView = ERootView;
+      }
+      [self leftRootButtonBarEvent:nil];
+    } else {
+      if(centerController.view.frame.origin.x < -100) {
+        openView  = ERootView;
+      } else if(centerController.view.frame.origin.x > -200) {
+        openView = ERightView;
+      }
+      [self rightRootButtonBarEvent:nil];
+    }
+    NSLog(@"UIGestureRecognizerStateEnded");
+  } else if([gesture state] == UIGestureRecognizerStateChanged) {
+
+   //NSLog(@"UIGestureRecognizerStateChanged");
+    //NSLog(@"pointScale ... -->%f",pointScale);
+    NSLog(@" open view %@", (openView == 0 ? @"Left view open":(openView  ==  1 ? @"Root view open" : @"Right view open")));
+    
+    if(openView == ERootView) {
+      [self changeUnderneathView:(translation.x < 0)];
+      NSLog(@"It's ROOT view now: with center frame %@",NSStringFromCGRect(centerController.view.frame));
+      if((translation.x > 0)) {
+        if(centerController.view.frame.origin.x <= 245) {
+          [self moveRootCByX:translation.x width:self.view.frame.size.width];
+        } else {
+          [self moveRootCByX:245 width:self.view.frame.size.width];
+          openView = ELeftView;
+          NSLog(@"Set to LEFT from ROOT view in if(translation.x > 0)");
+        }
+      } else {
+        if(centerController.view.frame.origin.x >= -245) {
+          [self moveRootCByX:translation.x width:self.view.frame.size.width];
+        } else {
+          [self moveRootCByX:-245 width:self.view.frame.size.width];
+          openView = ERightView;
+          NSLog(@"Set to RIGHT from ROOT view in if(translation.x < 0)");
+        }
+      }
+    } else if (openView == ELeftView) {
+      NSLog(@"It's LEFT view now: with center frame %@",NSStringFromCGRect(centerController.view.frame));
+      if(!isFingerLift) {
+        if(translation.x >= 245) {
+          [self moveRootCByX:245 width:self.view.frame.size.width];
+        } else  if(centerController.view.frame.origin.x <= 0) {
+          [self moveRootCByX:0 width:self.view.frame.size.width];
+          //NSLog(@"Set to RIGHT from LEFT view in isFingerLift ");
+          openView = ERootView;
+        } else {
+          [self moveRootCByX:translation.x width:self.view.frame.size.width];
+        }
+      } else if(translation.x < 0) {
+        if(translation.x > -245) {
+          CGFloat pointX = 245 + translation.x;
+          [self moveRootCByX:pointX width:self.view.frame.size.width];
+        } else {
+          [self moveRootCByX:0 width:self.view.frame.size.width];
+          //NSLog(@"Set to RIGHT from LEFT view in if(translation.x < 0)");
+          openView = ERootView;
+        }
+      } else if(centerController.view.frame.origin.x >= 245) {
+        [self moveRootCByX:245 width:self.view.frame.size.width];
+      } else {
+        [self moveRootCByX:0 width:self.view.frame.size.width];
+        openView = ERootView;
+      }
+    } else if (openView == ERightView) {
+      NSLog(@"It's RIGHT view now: with center frame %@",NSStringFromCGRect(centerController.view.frame));
+      if(!isFingerLift) {
+        if(translation.x <= -245) {
+          [self moveRootCByX:-245 width:self.view.frame.size.width];
+        } else  if(centerController.view.frame.origin.x >= 0) {
+          [self moveRootCByX:0 width:self.view.frame.size.width];
+          NSLog(@"Set to ROOT from RIGHT view in isFingerLift ");
+          openView = ERootView;
+        } else {
+          [self moveRootCByX:translation.x width:self.view.frame.size.width];
+        }
+      } else if(translation.x > 0) {
+        CGFloat pointX = -245 + translation.x;
+        [self moveRootCByX:pointX width:self.view.frame.size.width];
+      }
+    }
+    
+    /*
+    if(pointScale > 0) {
+      NSLog(@"direction toward left ..");
+      if(openView == ERootView) {
+        
+        if([[self.view subviews] indexOfObject:leftController.view] == 0) {
+            [self.view exchangeSubviewAtIndex:0 withSubviewAtIndex:1];
+        }
+        NSLog(@"To reveal left view.");
+        
+        //Only allow if the x cor of root is less than 245.
+        if(centerController.view.frame.origin.x <= 240) {
+          [self moveRootCByX:pointScale width:self.view.frame.size.width];
+        } else {
+          [self moveRootCByX:245 width:self.view.frame.size.width];
+          openView = ELeftView;
+        }
+      } else if (openView == ELeftView) {
+        
+        NSLog(@"To stop this here .. don't move the view.");
+        
+      } else if (openView == ERootView) {
+        NSLog(@"Right is already the underneath view so just move root view.");
+      }
+    } else if(pointScale == 0) {
+      NSLog(@"set the f(pointScale == 0) ");
+    } else {
+      if(openView == ERootView) {
+        //Insert the right view controller underneath the center view.
+        if([[self.view subviews] indexOfObject:rightController.view] == 0) {
+          [self.view exchangeSubviewAtIndex:0 withSubviewAtIndex:1];
+        }
+        NSLog(@"Opening right view.");
+        //Only allow if the x cor of root is less than 245.
+        if(centerController.view.frame.origin.x >= -240) {
+          [self moveRootCByX:pointScale width:self.view.frame.size.width];
+        } else {
+          [self moveRootCByX:-245 width:self.view.frame.size.width];
+          openView = ERightView;
+        }
+      } else if (openView == ERightView) {
+        NSLog(@"Closing right view ..");
+        if(centerController.view.frame.origin.x < 245) {
+          [self moveRootCByX:pointScale width:self.view.frame.size.width];
+        } else {
+          [self moveRootCByX:0 width:self.view.frame.size.width];
+          openView = ERootView;
+        }
+      } else if (openView == ERootView) {
+        NSLog(@"Right is already the underneath view so just move root view.");
+      }
+      NSLog(@"direction toward right ..");
+    }
+     */
   }
+  //[self displayRectPostion];
+}
+
+/*
+- (void)handlePanGestureRecognizer:(UIPanGestureRecognizer *)gesture {
+
+  JHCurrentView currentViewValue =  [self currentViewState];
+  CGPoint translation = [gesture translationInView:self.view];
+  NSLog(@"translation -->%@",NSStringFromCGPoint(translation));
+  
+  CGFloat pointScale = translation.x * 1.5;
+  
   if([gesture state] == UIGestureRecognizerStateBegan) {
     NSLog(@"UIGestureRecognizerStateBegan");
   } else if([gesture state] == UIGestureRecognizerStateEnded) {
-    
+
+    NSLog(@"UIGestureRecognizerStateEnded");
     if([self currentViewState] == ELeftView) {
+      
     } else if([self currentViewState] == ERootView) {
       if((-leftController.view.frame.origin.x) < leftController.view.frame.size.width/2) {
         
@@ -293,51 +466,60 @@ ENoneView,
               initialSpringVelocity:KINITIAL_SPRING_VALOCITY options:UIViewAnimationOptionCurveEaseInOut
                          animations:^{
                            [self moveLeftCByX:0 width:leftController.view.frame.size.width-KREVEAL_GAP];
-                           [self moveRootCByX:KSCREEN_WIDTH - KREVEAL_GAP];
+                           [self moveRootCByX:KSCREEN_WIDTH - KREVEAL_GAP width:self.view.frame.size.width];
                          } completion:nil];
       }
     } else if([self currentViewState] == ERightView) {
     }
-    
-    NSLog(@"UIGestureRecognizerStateEnded");
   } else if([gesture state] == UIGestureRecognizerStateChanged) {
+    NSLog(@"\n");
+    NSLog(@"point at ...%f",translation.x);
     [self displayRectPostion];
+
+    NSLog(@"Revealing  .. %f",pointScale);
+    NSLog(@"openView  .. %d",openView);
+
     if(currentViewValue == ELeftView) {
-      
-      
-    } else if(currentViewValue == ERootView) {
-      CGFloat pointScale = translation.x * 1.5;
-      if([self isMovingLeftDirection:translation.x]) {
-        NSLog(@"Moving toward left ..");
-        if(fabsf(leftController.view.frame.origin.x) > KREVEAL_GAP) {
-          [self moveLeftCByX:pointScale-KSCREEN_WIDTH width:leftController.view.frame.size.width];
-          [self moveRootCByX:pointScale];
-        } else {
-          currentView = leftController.view;
-          [self moveLeftCByX:0 width:leftController.view.frame.size.width - KREVEAL_GAP];
-          [self moveRootCByX:KSCREEN_WIDTH - KREVEAL_GAP];
-        }
-      } else if([self isMovingRightDirection:translation.x]) {
-        NSLog(@"Moving toward right ..");
-        if(centerController.view.frame.origin.x > 0) {
-          NSLog(@"Revealing root view ...");
-          [self moveLeftCByX:pointScale - KSCREEN_WIDTH width:leftController.view.frame.size.width];
-          [self moveRootCByX:pointScale];
-        } else {
-          NSLog(@"Set view as Root view.. ");
+      if(openView == ELeftView) {
+        if(leftController.view.frame.origin.x <= 0) {
           currentView = centerController.view;
-          [self moveLeftCByX:-KSCREEN_WIDTH width:leftController.view.frame.size.width];
-          [self moveRootCByX:0];
+          [self moveLeftCByX:-KSCREEN_WIDTH width:self.view.frame.size.width];
+          [self moveRootCByX:0 width:self.view.frame.size.width];
+          [self moveRightCByX:KSCREEN_WIDTH*2 width:self.view.frame.size.width];
         }
+        [self moveLeftCByX:pointScale width:self.view.frame.size.width - KREVEAL_GAP];
+        [self moveRootCByX:KSCREEN_WIDTH + pointScale width:self.view.frame.size.width];
       }
+    } else if(currentViewValue == ERootView) {
       
+      if(openView == ERootView) {
+        if(leftController.view.frame.origin.x >= 0) {
+          currentView = leftController.view;
+          openView = ELeftView;
+          [self moveLeftCByX:0 width:self.view.frame.size.width - KREVEAL_GAP];
+          [self moveRootCByX:KSCREEN_WIDTH - KREVEAL_GAP width:self.view.frame.size.width - KREVEAL_GAP];
+          [self moveRightCByX:KSCREEN_WIDTH*2 width:self.view.frame.size.width];
+          NSLog(@"set as left view");
+          return;
+        }
+        [self moveLeftCByX:KREVEAL_GAP+pointScale-KSCREEN_WIDTH width:self.view.frame.size.width - KREVEAL_GAP];
+        [self moveRootCByX:pointScale width:self.view.frame.size.width];
+      } else if(openView == ELeftView)  {
+        [self moveRootCByX:pointScale width:self.view.frame.size.width - KREVEAL_GAP];
+        [self moveRightCByX:KSCREEN_WIDTH - pointScale width:self.view.frame.size.width];
+      }
     } else if(currentViewValue == ERightView) {
       
     }
   }
   
+  NSLog(@"\n after settings ...");
+  [self displayRectPostion];
+
+  
   lastGesturePoint = translation;
 }
+*/
 
 -(BOOL) isMovingLeftDirection:(CGFloat) point {
   return ((fabsf(point) - fabsf(lastGesturePoint.x)) > 0);
@@ -357,10 +539,10 @@ ENoneView,
                                          width, leftController.view.frame.size.height);
 }
 
--(void) moveRootCByX:(CGFloat) xPoint {
+-(void) moveRootCByX:(CGFloat) xPoint width:(CGFloat) width{
   
   centerController.view.frame = CGRectMake(xPoint, centerController.view.frame.origin.y,
-                                           centerController.view.frame.size.width, centerController.view.frame.size.height);
+                                           width, centerController.view.frame.size.height);
   self.navigationController.navigationBar.frame = CGRectMake(xPoint, KNAVIGATION_BAR_Y, KSCREEN_WIDTH, KNAVIGATION_BAR_HEIGHT);
 }
 
