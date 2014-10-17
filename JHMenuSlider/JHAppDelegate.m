@@ -40,9 +40,11 @@
   // Override point for customization after application launch.
   self.window.backgroundColor = [UIColor whiteColor];
   JHRootViewController *controller = [[JHRootViewController alloc] initWithNibName:nil bundle:nil];
+  
   UINavigationController * navi = [[UINavigationController alloc] initWithRootViewController:controller];
   self.window.rootViewController = navi;
   [self.window makeKeyAndVisible];
+  
   return YES;
 }
 
